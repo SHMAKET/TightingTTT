@@ -1,96 +1,77 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#include <Adafruit_NeoPixel.h>
+#include <GyverButton.h>
 
-#pragma region  properties
+#include "config.h"
+#include "wifi_manager.h"
+#include "time_manager.h"
+#include "logger.h"
 
-// Пины
-#define SENSOR_PIN      D5        // Датчик движения RCWL-0516
-#define LED_PIN         D2        // WS2812
-#define BTN_PIN         D1        // Кнопка (подтянута к питанию через INPUT_PULLUP)
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+GButton btn(BTN_PIN);
+GButton sensor(SENSOR_PIN);
 
-// Количество светодиодов
-#define NUM_LEDS 1
+void waveFromCenter(uint32_t color, int delayTime);
 
-// Задайте свои данные Wi-Fi
-const char* ssid        = "karbafos";
-const char* password    = "Audi80b4avant";
-
-const long gmtOffset_sec = 3 * 3600;    // Часовой пояс в секундах (например, Москва UTC+3 = 3*3600 = 10800)
-const int daylightOffset_sec = 0;       // Коррекция летнего времени (0 если не используется)
-
-#pragma endregion
-#pragma region function definition
-
-void INIT_WIFI();
-void INIT_NTP();
-tm GetTime();
-
-#pragma endregion
+bool LedsIsOn;
 
 void setup() {
+  strip.begin();
+  strip.show();
+  strip.setBrightness(BRIGHTNESS_LED);
+
   pinMode(SENSOR_PIN, INPUT);
   pinMode(BTN_PIN, INPUT_PULLUP);
   
   Serial.begin(115200);
   delay(100);
-  
-  INIT_WIFI();
-  INIT_NTP();
+
+  initWiFi(ssid, password);
+  initTime("pool.ntp.org", gmtOffset_sec, daylightOffset_sec);
+
+  print("<===START===>");
+  waveFromCenter(strip.Color(0, 255, 0), 100); // волна голубая
+  LedsIsOn = false;
 }
 
 void loop() {
-  bool buttonPressed = digitalRead(BTN_PIN) == LOW;     // Нажата ли кнопка?
+  btn.tick();
+  sensor.tick();
+  
+  strip.show();
+}
 
-  if (buttonPressed) {
-    GetTime();
-    delay(300);
+
+
+void waveFromCenter(uint32_t baseColor, int delayTime) {
+  int left = (LED_COUNT / 2) - 1;   // левая середина (21)
+  int right = (LED_COUNT / 2);      // правая середина (22)
+
+  for (int step = 0; step <= LED_COUNT / 2 + 5; step++) {
+    strip.clear();
+    for (int offset = 0; offset < 5; offset++) {
+      // коэффициент яркости (от 1.0 в центре до 0.2 на краю)
+      float brightness = 1.0 - (offset * 0.2);
+      // вытащим R,G,B
+      uint8_t r = (uint8_t)(((baseColor >> 16) & 0xFF) * brightness);
+      uint8_t g = (uint8_t)(((baseColor >> 8) & 0xFF) * brightness);
+      uint8_t b = (uint8_t)((baseColor & 0xFF) * brightness);
+      // позиция слева
+      int posL = left - step - offset;
+      if (posL >= 0) {
+        strip.setPixelColor(posL, strip.Color(r, g, b));
+      }
+      // позиция справа
+      int posR = right + step + offset;
+      if (posR < LED_COUNT) {
+        strip.setPixelColor(posR, strip.Color(r, g, b));
+      }
+    }
+    strip.show();
+    delay(delayTime);
   }
+  delay(500);     // пауза после волны
+  strip.clear();  // погасить
+  strip.show();
 }
 
-tm GetTime() {
-  time_t now = time(nullptr);
-  struct tm timeinfo;
-  localtime_r(&now, &timeinfo);
-
-  // Формируем строку времени
-  char timeString[128];
-  snprintf(timeString, sizeof(timeString), "Получено время: %02d:%02d:%02d/%04d-%02d-%02d",
-            timeinfo.tm_hour,
-            timeinfo.tm_min,
-            timeinfo.tm_sec,
-            timeinfo.tm_year + 1900,
-            timeinfo.tm_mon + 1,
-            timeinfo.tm_mday);
-
-  Serial.println(timeString);
-
-  return timeinfo;
-}
-
-void INIT_WIFI() {
-  // Подключаемся к Wi-Fi
-  Serial.printf("Подключение к %s", ssid);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-  Serial.println("WiFi подключен");
-}
-
-void INIT_NTP() {
-  // Настройка времени через NTP
-  configTime(gmtOffset_sec, daylightOffset_sec,  "pool.ntp.org", "time.nist.gov");
-
-  Serial.println("Ожидание синхронизации времени...");
-  time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
-    delay(500);
-    Serial.print(".");
-    now = time(nullptr);
-  }
-  Serial.println();
-  Serial.println("Время синхронизировано!");
-}
