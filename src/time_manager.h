@@ -8,3 +8,11 @@ extern struct tm currentTime;
 void initTime(const char* ntpServer, long gmtOffset_sec, int daylightOffset_sec);
 bool updateTime();
 String TimeToString(const tm &timeStruct);
+bool operator<(const tm& a, const tm& b);
+bool operator<=(const tm& a, const tm& b);
+bool operator>(const tm& a, const tm& b);
+bool operator>=(const tm& a, const tm& b);
+bool operator==(const tm& a, const tm& b);
+bool operator!=(const tm& a, const tm& b);
+
+bool IsInInterval(const tm& now, const tm& start, const tm& end);

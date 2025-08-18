@@ -9,11 +9,8 @@
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 GButton btn(BTN_PIN);
-GButton sensor(SENSOR_PIN);
 
 void waveFromCenter(uint32_t color, int delayTime);
-
-bool LedsIsOn;
 
 void setup() {
   strip.begin();
@@ -30,18 +27,34 @@ void setup() {
   initTime("pool.ntp.org", gmtOffset_sec, daylightOffset_sec);
 
   print("<===START===>");
-  waveFromCenter(strip.Color(0, 255, 0), 100); // волна голубая
-  LedsIsOn = false;
+  waveFromCenter(strip.Color(0, 255, 0), 100);
+
+  print(TimeToString(StartTime) + " | " + TimeToString(currentTime) + " | " + TimeToString(EndTime));
 }
 
 void loop() {
-  btn.tick();
-  sensor.tick();
+  btn.tick(); 
+
+  if (updateTime() && IsInInterval(currentTime, StartTime, EndTime)) {
+    if (digitalRead(SENSOR_PIN) == HIGH) {
+      strip.fill(strip.Color(255, 255, 255));
+      strip.show();
+      print("FILL START");
+      
+      delay(glowTime * 1000);
+      print("FILL END");
+    }
+  }
+
+  if(btn.isClick()) 
+  {
+    print("CLICK");
+    waveFromCenter(strip.Color(0, 0, 255), 50);
+  }
   
+  strip.fill(strip.Color(0,0,0));
   strip.show();
 }
-
-
 
 void waveFromCenter(uint32_t baseColor, int delayTime) {
   int left = (LED_COUNT / 2) - 1;   // левая середина (21)

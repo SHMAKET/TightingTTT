@@ -52,3 +52,29 @@ String TimeToString(const tm &timeStruct) {
     );
     return String(buf);
 }
+
+inline int TimeToSeconds(const tm& t) {
+    return t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec;
+}
+
+// Перегрузка операторов
+bool operator<(const tm& a, const tm& b)  { return TimeToSeconds(a) <  TimeToSeconds(b); }
+bool operator<=(const tm& a, const tm& b) { return TimeToSeconds(a) <= TimeToSeconds(b); }
+bool operator>(const tm& a, const tm& b)  { return TimeToSeconds(a) >  TimeToSeconds(b); }
+bool operator>=(const tm& a, const tm& b) { return TimeToSeconds(a) >= TimeToSeconds(b); }
+bool operator==(const tm& a, const tm& b) { return TimeToSeconds(a) == TimeToSeconds(b); }
+bool operator!=(const tm& a, const tm& b) { return !(a == b); }
+
+bool IsInInterval(const tm& now, const tm& start, const tm& end) {
+    int nowSec   = TimeToSeconds(now);
+    int startSec = TimeToSeconds(start);
+    int endSec   = TimeToSeconds(end);
+
+    if (startSec <= endSec) {
+        // интервал внутри одного дня
+        return nowSec >= startSec && nowSec <= endSec;
+    } else {
+        // интервал переходит через полночь
+        return nowSec >= startSec || nowSec <= endSec;
+    }
+}
