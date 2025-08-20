@@ -16,3 +16,5 @@ bool operator==(const tm& a, const tm& b);
 bool operator!=(const tm& a, const tm& b);
 
 bool IsInInterval(const tm& now, const tm& start, const tm& end);
+
+tm operator+(const tm& a, const tm& b);

@@ -65,6 +65,13 @@ bool operator>=(const tm& a, const tm& b) { return TimeToSeconds(a) >= TimeToSec
 bool operator==(const tm& a, const tm& b) { return TimeToSeconds(a) == TimeToSeconds(b); }
 bool operator!=(const tm& a, const tm& b) { return !(a == b); }
 
+tm operator+(const tm& a, const tm& b) {
+    time_t ta = mktime(const_cast<tm*>(&a));
+    time_t tb = b.tm_hour * 3600 + b.tm_min * 60 + b.tm_sec;
+    time_t sum = ta + tb;
+    return *localtime(&sum);
+}
+
 bool IsInInterval(const tm& now, const tm& start, const tm& end) {
     int nowSec   = TimeToSeconds(now);
     int startSec = TimeToSeconds(start);

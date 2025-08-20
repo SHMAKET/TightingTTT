@@ -7,6 +7,6 @@ void print(String mess) {
         Serial.println("[" + TimeToString(currentTime) + "] " + mess);
     }
     else {
-        Serial.println("[NoTime] " + mess);
+        Serial.println("[       NoTime      ]  " + mess);
     }
 }
