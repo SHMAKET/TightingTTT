@@ -9,7 +9,9 @@ void initWiFi(const char* ssid, const char* password) {
         delay(500);
         Serial.print(".");
     }
-    Serial.println("\nWiFi connected.");
+    Serial.println();
+    Serial.println("[NoTime] WiFi connected.");
+    Serial.println("[NoTime] IP addres: " + WiFi.localIP().toString());
 }
 
 bool isWiFiConnected() {
