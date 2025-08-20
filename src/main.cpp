@@ -11,6 +11,7 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 GButton btn(BTN_PIN);
 
 void waveFromCenter(uint32_t color, int delayTime);
+tm TimeOff; // время в которое лента будет выключена
 
 void setup() {
   strip.begin();
@@ -38,11 +39,12 @@ void loop() {
   if (updateTime() && IsInInterval(currentTime, StartTime, EndTime)) {
     if (digitalRead(SENSOR_PIN) == HIGH) {
       strip.fill(strip.Color(255, 255, 255));
-      strip.show();
-      print("FILL START");
-      
-      delay(glowTime * 1000);
-      print("FILL END");
+      TimeOff = currentTime + glowTime;
+      print("STRIP ON");
+    }
+    else if (currentTime == TimeOff) {
+      strip.fill(strip.Color(0,0,0));
+      print("STRIP OFF");
     }
   }
 
@@ -50,9 +52,8 @@ void loop() {
   {
     print("CLICK");
     waveFromCenter(strip.Color(0, 0, 255), 50);
-  }
+  }  
   
-  strip.fill(strip.Color(0,0,0));
   strip.show();
 }
 

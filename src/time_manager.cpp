@@ -1,7 +1,7 @@
 #include "time_manager.h"
 #include "logger.h"
 
-struct tm currentTime; // глобальная переменная
+struct tm currentTime; // текушее время
 
 // Внутренние переменные
 static unsigned long lastSyncMillis = 0;   // время последней синхронизации (millis)
