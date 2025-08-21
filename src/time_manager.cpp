@@ -23,7 +23,7 @@ bool updateTime() {
     // Если давно не синхронизировались — запрос к NTP
     if (nowMillis - lastSyncMillis >= syncIntervalMs || lastSyncMillis == 0) {
         if (!getLocalTime(&currentTime)) {
-            print("Failed to obtain time");
+            Serial.print("Failed to obtain time");
             return false;
         }
         // Сохраняем время Unix (в секундах)

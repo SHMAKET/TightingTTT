@@ -32,16 +32,18 @@ void setup() {
 }
 
 void loop() {
+  if (!updateTime()) return;
+
   btn.tick(); 
 
-  if (updateTime() && IsInInterval(currentTime, StartTime, EndTime)) {
+  if (IsInInterval(currentTime, StartTime, EndTime)) {
     if (digitalRead(SENSOR_PIN) == HIGH) {
       strip.fill(strip.Color(255, 255, 255));
       TimeOff = currentTime + glowTime;
       print("STRIP ON");
     }
     else if (currentTime == TimeOff) {
-      strip.fill(strip.Color(0,0,0));
+      strip.clear();
       print("STRIP OFF");
     }
   }
@@ -50,14 +52,14 @@ void loop() {
   {
     print("CLICK");
     waveFromCenter(strip.Color(0, 0, 255), 65);
-  }  
+  }
   
   strip.show();
 }
 
 void waveFromCenter(uint32_t baseColor, int delayTime) {
-  int left = (LED_COUNT / 2) - 1;   // левая середина (21)
-  int right = (LED_COUNT / 2);      // правая середина (22)
+  int left = (LED_COUNT / 2) - 1;
+  int right = (LED_COUNT / 2);
 
   for (int step = 0; step <= LED_COUNT / 2 + 5; step++) {
     strip.clear();
