@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <GyverButton.h>
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h>
 
 #include "config.h"
 #include "wifi_manager.h"
@@ -9,6 +11,7 @@
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 GButton btn(BTN_PIN);
+AsyncWebServer server(80);
 
 void waveFromCenter(uint32_t color, int delayTime);
 tm TimeOff; // время в которое лента будет выключена
@@ -18,6 +21,12 @@ void setup() {
   strip.show();
   strip.setBrightness(BRIGHTNESS_LED);
 
+  // Запускаем файловую систему
+  if (!LittleFS.begin()) {
+    Serial.println("LittleFS mount failed");
+    return;
+  }
+
   pinMode(SENSOR_PIN, INPUT);
   pinMode(BTN_PIN, INPUT_PULLUP);
   
@@ -26,6 +35,12 @@ void setup() {
 
   initWiFi(ssid, password);
   initTime(gmtOffset_sec, daylightOffset_sec);
+
+  // Обработка корневой страницы
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "site/index.html", "text/html");
+  });
+  server.begin(); // Запуск сервера
 
   print("<===START===>");
   waveFromCenter(strip.Color(0, 255, 0), 65);
