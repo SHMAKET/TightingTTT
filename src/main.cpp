@@ -25,12 +25,10 @@ void setup() {
   delay(100);
 
   initWiFi(ssid, password);
-  initTime("pool.ntp.org", gmtOffset_sec, daylightOffset_sec);
+  initTime(gmtOffset_sec, daylightOffset_sec);
 
   print("<===START===>");
-  waveFromCenter(strip.Color(0, 255, 0), 100);
-
-  print(TimeToString(StartTime) + " | " + TimeToString(currentTime) + " | " + TimeToString(EndTime));
+  waveFromCenter(strip.Color(0, 255, 0), 65);
 }
 
 void loop() {
@@ -51,7 +49,7 @@ void loop() {
   if(btn.isClick()) 
   {
     print("CLICK");
-    waveFromCenter(strip.Color(0, 0, 255), 50);
+    waveFromCenter(strip.Color(0, 0, 255), 65);
   }  
   
   strip.show();
@@ -84,7 +82,7 @@ void waveFromCenter(uint32_t baseColor, int delayTime) {
     strip.show();
     delay(delayTime);
   }
-  delay(500);     // пауза после волны
+  delay(100);     // пауза после волны
   strip.clear();  // погасить
   strip.show();
 }

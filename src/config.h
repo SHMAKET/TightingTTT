@@ -1,8 +1,9 @@
 #pragma once
+#include "secretConf.h"
 
-// Задайте свои данные Wi-Fi
-inline const char* ssid        = "karbafos";
-inline const char* password    = "Audi80b4avant";
+// Данные Wi-Fi
+// inline const char* ssid        = "My_ssid";
+// inline const char* password    = "My_password";
 
 // Пины
 #define SENSOR_PIN      D1        // Датчик движения RCWL-0516
@@ -11,12 +12,12 @@ inline const char* password    = "Audi80b4avant";
 
 // Количество светодиодов
 #define LED_COUNT 44               // 136
-#define BRIGHTNESS_LED 20          // Яркость (0-255)
+#define BRIGHTNESS_LED 255 * 0.20  // Яркость (0-255)
 
 const long gmtOffset_sec = 3 * 3600;    // Часовой пояс в секундах (например, Москва UTC+3 = 3*3600 = 10800)
 const int daylightOffset_sec = 0;       // Коррекция летнего времени (0 если не используется)
 const unsigned long syncIntervalMs = 3600000; // 1 час = 3600*1000 мс интервал синхронизации времени с сервером
 //                   СС  ММ  ЧЧ
-const tm glowTime  {  3,  0,  0 };      // время свечения с полседнего срабатывания датчика RCWL-0516 + задержка самого датчика
+const tm glowTime  {  1,  0,  0 };      // время свечения после срабатывания датчика + задержка самого датчика (2-3c)
 const tm StartTime {  0, 30,  7 }; //{ 0, 30, 22 };       // врямя начала опроса датчика
-const tm EndTime   {  0, 30,  6  };     // время окночания опроса датчика
+const tm EndTime   {  0, 30,  6 };      // время окночания опроса датчика

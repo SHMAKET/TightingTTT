@@ -7,8 +7,12 @@ struct tm currentTime; // текушее время
 static unsigned long lastSyncMillis = 0;   // время последней синхронизации (millis)
 static time_t lastUnixTime = 0;            // время с сервера в секундах Unix
 
-void initTime(const char* ntpServer, long gmtOffset_sec, int daylightOffset_sec) {
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+void initTime(long gmtOffset_sec, int daylightOffset_sec) {
+    configTime(gmtOffset_sec, daylightOffset_sec, 
+        "time.nist.gov",
+        "ntp2.colocall.net",
+        "time.google.com"
+    );
     lastSyncMillis = 0; // чтобы первая синхронизация была сразу
     print("time: ok");   
 }

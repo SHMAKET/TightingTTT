@@ -7,7 +7,7 @@ void print(String mess) {
 
     static unsigned long lastTime = 0;
     unsigned long now = millis();
-    if (mess == lastMessage && (now - lastTime) < 1000)
+    if (mess == lastMessage && (now - lastTime) < 10000)
         return;
 
     lastMessage = mess;
