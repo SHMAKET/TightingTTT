@@ -1,7 +1,7 @@
 #pragma once
 #include "secretConf.h"
 
-// Данные Wi-Fi
+// Данные Wi-Fi перенесено в secretConf
 // inline const char* ssid        = "My_ssid";
 // inline const char* password    = "My_password";
 
