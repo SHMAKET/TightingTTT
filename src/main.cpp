@@ -36,6 +36,10 @@ void setup() {
   initWiFi(ssid, password);
   initTime(gmtOffset_sec, daylightOffset_sec);
 
+  // Отдаём статические файлы из папки /site
+  server.serveStatic("/", LittleFS, "/site/")
+    .setDefaultFile("index.html");
+
   // Обработка корневой страницы
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "site/index.html", "text/html");
