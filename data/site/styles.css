@@ -1,0 +1,37 @@
+:root {
+    --bg:      #2E3440;
+    --text:    #ECEFF4;
+    --accent1: #88C0D0;
+    --accent2: #A3BE8C;
+    --accent3: #EBCB8B;
+}
+
+.light {
+    --bg:      #FFFFFF;
+    --text:    #2E3440;
+    --accent1: #5E81AC;
+    --accent2: #4C8C6F;
+    --accent3: #C47D3E;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    transition: 0.3s;
+}
+
+h1 {
+    color: var(--accent1);
+}
+
+p {
+    color: var(--accent2);
+}
+
+button {
+    background: var(--accent3);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
