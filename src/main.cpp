@@ -8,18 +8,21 @@
 #include "wifi_manager.h"
 #include "time_manager.h"
 #include "logger.h"
+#include "SmoothStrip.h"
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 GButton btn(BTN_PIN);
 AsyncWebServer server(80);
+SmoothStrip smooth(strip, MAX_BRIGHTNESS_LED);
 
-void waveFromCenter(uint32_t color, int delayTime);
 tm TimeOff; // время в которое лента будет выключена
+bool isOn = false;
 
 void setup() {
-  strip.begin();
-  strip.show();
-  strip.setBrightness(BRIGHTNESS_LED);
+  Serial.begin(115200);
+  delay(100);
+
+  smooth.begin();
 
   // Запускаем файловую систему
   if (!LittleFS.begin()) {
@@ -30,9 +33,6 @@ void setup() {
   pinMode(SENSOR_PIN, INPUT);
   pinMode(BTN_PIN, INPUT_PULLUP);
   
-  Serial.begin(115200);
-  delay(100);
-
   initWiFi(ssid, password);
   initTime(gmtOffset_sec, daylightOffset_sec);
 
@@ -45,66 +45,33 @@ void setup() {
     request->send(LittleFS, "site/index.html", "text/html");
   });
   server.begin(); // Запуск сервера
-
+  
+  // приветсвенное мигание
+  smooth.ON(strip.Color(050, 162, 252), 1000, EASE_IN);
+  while (smooth.isFading()) { smooth.update(); delay(10); }
+  
+  smooth.OFF(1000, EASE_OUT);
+  while (smooth.isFading()) { smooth.update(); delay(10); }
+  
   print("<===START===>");
-  waveFromCenter(strip.Color(0, 255, 0), 65);
 }
 
 void loop() {
   if (!updateTime()) return;
 
-  btn.tick(); 
+  btn.tick();
 
   if (IsInInterval(currentTime, StartTime, EndTime)) {
     if (digitalRead(SENSOR_PIN) == HIGH) {
-      strip.fill(strip.Color(255, 255, 255));
       TimeOff = currentTime + glowTime;
+      smooth.ON(strip.Color(255, 255, 255), 500, EASE_IN);
       print("STRIP ON");
     }
     else if (currentTime == TimeOff) {
-      strip.clear();
+      smooth.OFF(500, EASE_OUT);
       print("STRIP OFF");
     }
   }
-
-  if(btn.isClick()) 
-  {
-    print("CLICK");
-    waveFromCenter(strip.Color(0, 0, 255), 65);
-  }
   
-  strip.show();
-}
-
-void waveFromCenter(uint32_t baseColor, int delayTime) {
-  int left = (LED_COUNT / 2) - 1;
-  int right = (LED_COUNT / 2);
-
-  for (int step = 0; step <= LED_COUNT / 2 + 5; step++) {
-    strip.clear();
-    for (int offset = 0; offset < 5; offset++) {
-      // коэффициент яркости (от 1.0 в центре до 0.2 на краю)
-      float brightness = 1.0 - (offset * 0.2);
-      // вытащим R,G,B
-      uint8_t r = (uint8_t)(((baseColor >> 16) & 0xFF) * brightness);
-      uint8_t g = (uint8_t)(((baseColor >> 8) & 0xFF) * brightness);
-      uint8_t b = (uint8_t)((baseColor & 0xFF) * brightness);
-      // позиция слева
-      int posL = left - step - offset;
-      if (posL >= 0) {
-        strip.setPixelColor(posL, strip.Color(r, g, b));
-      }
-      // позиция справа
-      int posR = right + step + offset;
-      if (posR < LED_COUNT) {
-        strip.setPixelColor(posR, strip.Color(r, g, b));
-      }
-    }
-    strip.show();
-    delay(delayTime);
-  }
-  delay(100);     // пауза после волны
-  strip.clear();  // погасить
-  strip.show();
-}
-
+  smooth.update();
+} 
