@@ -49,11 +49,9 @@ void setup() {
   // приветсвенное мигание
   smooth.ON(strip.Color(050, 162, 252), 1000, EASE_IN);
   while (smooth.isFading()) { smooth.update(); delay(10); }
-  
+  print("<===START===>");
   smooth.OFF(1000, EASE_OUT);
   while (smooth.isFading()) { smooth.update(); delay(10); }
-  
-  print("<===START===>");
 }
 
 void loop() {
@@ -64,11 +62,11 @@ void loop() {
   if (IsInInterval(currentTime, StartTime, EndTime)) {
     if (digitalRead(SENSOR_PIN) == HIGH) {
       TimeOff = currentTime + glowTime;
-      smooth.ON(strip.Color(255, 255, 255), 500, EASE_IN);
+      smooth.ON(strip.Color(255, 255, 255), TIME_ON, EASE_OUT);
       print("STRIP ON");
     }
     else if (currentTime == TimeOff) {
-      smooth.OFF(500, EASE_OUT);
+      smooth.OFF(TIME_OFF, EASE_IN);
       print("STRIP OFF");
     }
   }
