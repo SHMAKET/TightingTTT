@@ -1,4 +1,22 @@
+const html = document.documentElement;
 const btn = document.getElementById("theme-toggle");
+
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme) {
+    html.setAttribute("data-bs-theme", savedTheme);
+} else {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    html.setAttribute("data-bs-theme", prefersDark ? "dark" : "light");
+}
+
 btn.addEventListener("click", () => {
-    document.body.classList.toggle("light");
+    const currentTheme = html.getAttribute("data-bs-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    html.setAttribute("data-bs-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
 });
+
+const numberInput = document.getElementById("brightness");
+const rangeInput  = document.getElementById("brightnessRange");
+numberInput.addEventListener("input", () => { rangeInput.value = numberInput.value; });
+rangeInput.addEventListener("input", () => { numberInput.value = rangeInput.value; });
